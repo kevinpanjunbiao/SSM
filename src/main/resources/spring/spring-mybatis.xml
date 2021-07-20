@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-3.0.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+      http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
+
+    <!-- 1.加载用于数据库配置的属性文件 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+    <!-- 2.包扫描：entity,dao，service -->
+    <context:component-scan base-package="com.pjb.ssm.entity,com.pjb.ssm.dao,com.pjb.ssm.service"/>
+    <!-- 3.dataSource数据源，使用DBCP数据库连接池 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+        <!-- 数据库驱动名称 -->
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <!-- 数据库连接底座 -->
+        <property name="url" value="${jdbc.url}"/>
+        <!-- 登录数据库的用户名 -->
+        <property name="username" value="${jdbc.username}"/>
+        <!-- 登录数据库的密码 -->
+        <property name="password" value="${jdbc.password}"/>
+        <!-- 连接池的最大数据库连接数，设置默认值0表示无限 -->
+        <property name="maxTotal" value="${dbcp.pool.maxTotal:0}"/>
+        <!-- 最大空闲数，即数据库连接的最大空闲时间。当超过空闲时间时，数据库连接将被标记为不可用，然后被释放，设置默认值0表示无限 -->
+        <property name="maxIdle" value="${dbcp.pool.maxIdle:0}"/>
+    </bean>
+
+    <!-- 4.配置SqlSessionFactory对象 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 数据源 -->
+        <property name="dataSource" ref="dataSource" />
+        <!-- 配置MyBaties全局配置文件:mybatis-config.xml -->
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml" />
+        <!-- 扫描entity包 使用别名 -->
+        <property name="typeAliasesPackage" value="com.pjb.ssm.entity" />
+        <!-- 扫描sql配置文件:mapper需要的xml文件 -->
+        <property name="mapperLocations" value="classpath:mapping/*.xml" />
+    </bean>
+
+    <!-- 5.事务管理 -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+    <!-- 事务通知 -->
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="all*" propagation="REQUIRED"/>
+            <tx:method name="*" read-only="true"/>
+        </tx:attributes>
+    </tx:advice>
+    <!-- 配置事务的代理 -->
+    <aop:config>
+        <!-- 定义一个切面 -->
+        <aop:pointcut id="allManagerMethod" expression="execution(* com.pjb.ssm.service.impl.*.*(..))"/>
+        <!-- 将事务通知与切面组合 -->
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="allManagerMethod"/>
+    </aop:config>
+
+    <!-- 6.配置扫描Dao接口包，动态实现Dao接口，注入到spring容器中 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <!-- 注入sqlSessionFactory -->
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+        <!-- 给出需要扫描Dao接口包 -->
+        <property name="basePackage" value="com.pjb.ssm.dao" />
+    </bean>
+</beans>

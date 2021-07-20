@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pjb.ssm.dao.UserDao">
+    <!-- 查询用户 -->
+    <select id="getUserById" parameterType="int" resultType="userInfo">
+        SELECT * FROM tb_user WHERE user_id = #{userId}
+    </select>
+
+    <!-- 新增用户 -->
+    <insert id="addUser" parameterType="userInfo">
+        INSERT INTO tb_user(user_name,blog_url,sex,province_name,hobby,remark)
+        VALUES(#{userName},#{blogUrl},#{sex},#{provinceName},#{hobby},#{remark});
+    </insert>
+
+    <!-- 修改用户 -->
+    <update id="updateUser" parameterType="userInfo">
+        UPDATE tb_user SET user_name=#{userName},blog_url=#{blogUrl},sex=#{sex},province_name=#{provinceName},hobby=#{hobby},remark=#{remark}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 删除用户 -->
+    <delete id="deleteUser" parameterType="java.lang.Integer">
+        DELETE FROM tb_user WHERE user_id = #{userId}
+    </delete>
+</mapper>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <!-- 全局配置参数 -->
+    <settings>
+        <!-- 指定 MyBatis 所用日志的具体实现，未指定时将自动查找 -->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <!-- 开启自动驼峰命名规则（camel case）映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+        <!-- 开启延时加载开关 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- 将积极加载改为消极加载（即按需加载）,默认值就是false -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!-- 打开全局缓存开关（二级环境），默认值就是true -->
+        <setting name="cacheEnabled" value="true"/>
+        <!-- 开启自动驼峰命名规则（camel case）映射 -->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <!-- 别名定义 -->
+    <typeAliases>
+        <package name="com.pjb.fms.entity"/>
+    </typeAliases>
+</configuration>
